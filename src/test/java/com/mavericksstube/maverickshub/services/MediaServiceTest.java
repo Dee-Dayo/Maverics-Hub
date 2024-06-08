@@ -1,11 +1,20 @@
 package com.mavericksstube.maverickshub.services;
 
+import com.fasterxml.jackson.databind.node.TextNode;
+import com.github.fge.jackson.jsonpointer.JsonPointer;
+import com.github.fge.jackson.jsonpointer.JsonPointerException;
+import com.github.fge.jsonpatch.JsonPatch;
+import com.github.fge.jsonpatch.JsonPatchOperation;
+import com.github.fge.jsonpatch.ReplaceOperation;
 import com.mavericksstube.maverickshub.dtos.requests.UpdateMediaRequest;
 import com.mavericksstube.maverickshub.dtos.requests.UploadMediaRequest;
+import com.mavericksstube.maverickshub.dtos.response.MediaResponse;
 import com.mavericksstube.maverickshub.dtos.response.UpdateMediaResponse;
 import com.mavericksstube.maverickshub.dtos.response.UploadMediaResponse;
+import com.mavericksstube.maverickshub.models.Category;
 import com.mavericksstube.maverickshub.models.Media;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -18,9 +27,9 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 
-import static com.mavericksstube.maverickshub.models.Category.ACTION;
-import static com.mavericksstube.maverickshub.models.Category.HORROR;
+import static com.mavericksstube.maverickshub.models.Category.*;
 import static com.mavericksstube.maverickshub.utils.TestUtils.TEST_IMAGE_LOCATION;
 import static com.mavericksstube.maverickshub.utils.TestUtils.TEST_VIDEO_LOCATION;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -43,6 +52,7 @@ public class MediaServiceTest {
     }
 
     @Test
+    @DisplayName("test you can upload images")
     public void uploadMediaTest(){
         Path path = Paths.get(TEST_IMAGE_LOCATION);
 
@@ -59,6 +69,7 @@ public class MediaServiceTest {
     }
 
     @Test
+    @DisplayName("Test you can upload videos")
     public void uploadVideoTest(){
         Path path = Paths.get(TEST_VIDEO_LOCATION);
 
@@ -74,6 +85,7 @@ public class MediaServiceTest {
     }
 
     @Test
+    @DisplayName("test you can get media")
     public void getMediaByIdTest(){
         Media media = mediaService.getMediaBy(100L);
         log.info("found content -> {}", media);
@@ -82,7 +94,8 @@ public class MediaServiceTest {
 
 
     @Test
-    public void updateMediaCategoryTest(){
+    @DisplayName("test update media files")
+    public void updateCategoryTest(){
         assertThat(mediaService.getMediaBy(101).getDescription()).contains("media");
         assertThat(mediaService.getMediaBy(101L).getCategory()).isEqualTo(ACTION);
 
@@ -90,11 +103,37 @@ public class MediaServiceTest {
         updateMediaRequest.setId(101L);
         updateMediaRequest.setCategory(HORROR);
         updateMediaRequest.setDescription("THis is a horror movie");
-        mediaService.updateMedia(updateMediaRequest);
+        mediaService.update(updateMediaRequest);
 
         Media media = mediaService.getMediaBy(101L);
 
         assertThat(media.getDescription()).contains("horror");
         assertThat(media.getCategory()).isEqualTo(HORROR);
     }
+
+    @Test
+    @DisplayName("Test that media can be updated without setting the rest null")
+    public void updateTest(){
+        Category category = mediaService.getMediaBy(100L).getCategory();
+        assertThat(category).isEqualTo(ACTION);
+
+        try{
+            List<JsonPatchOperation> operations = List.of(new ReplaceOperation(new JsonPointer("/category"), new TextNode(ROMANCE.name())));
+            JsonPatch updateMediaRequest = new JsonPatch(operations);
+            UpdateMediaResponse response = mediaService.updateOne(100L, updateMediaRequest);
+            assertThat(response).isNotNull();
+            category = mediaService.getMediaBy(100L).getCategory();
+            assertThat(category).isEqualTo(ROMANCE);
+        } catch (JsonPointerException e){
+            assertThat(e).isNotNull();
+        }
+    }
+
+    @Test
+    public void getMediaForUserTest(){
+        Long userId = 200L;
+        List<MediaResponse> media = mediaService.getMediaFor(userId);
+        assertThat(media).hasSize(3);
+    }
 }
+

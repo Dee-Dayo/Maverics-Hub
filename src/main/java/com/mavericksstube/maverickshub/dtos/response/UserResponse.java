@@ -1,47 +1,38 @@
-package com.mavericksstube.maverickshub.models;
+package com.mavericksstube.maverickshub.dtos.response;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
-import jakarta.persistence.*;
+import com.mavericksstube.maverickshub.models.Category;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
 import lombok.AccessLevel;
-import lombok.Getter;
+import lombok.Data;
 import lombok.Setter;
-import lombok.ToString;
 
 import java.time.LocalDateTime;
 
 import static jakarta.persistence.EnumType.STRING;
-import static java.time.LocalDateTime.now;
+import static jakarta.persistence.GenerationType.IDENTITY;
 
-
-@Entity
-@Getter
-@Setter
-@ToString
-public class Media {
+@Data
+public class UserResponse {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = IDENTITY)
     private Long id;
-    private String url;
-    private String description;
-    @Enumerated(value = STRING)
-    private Category category;
+    private String email;
+    private String password;
+
 
     @Setter(AccessLevel.NONE)
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime timeCreated;
 
-    @ManyToOne
-    private User uploader;
-
-
-
-    @PrePersist
-    private void setTimeCreated(){
-        this.timeCreated = now();
-    }
-
+    @Setter(AccessLevel.NONE)
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+    private LocalDateTime timeUpdated;
 }
