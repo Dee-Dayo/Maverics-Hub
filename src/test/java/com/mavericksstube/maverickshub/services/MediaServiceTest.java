@@ -18,20 +18,16 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.jdbc.Sql;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
 import static com.mavericksstube.maverickshub.models.Category.*;
-import static com.mavericksstube.maverickshub.utils.TestUtils.TEST_IMAGE_LOCATION;
-import static com.mavericksstube.maverickshub.utils.TestUtils.TEST_VIDEO_LOCATION;
+import static com.mavericksstube.maverickshub.utils.TestUtils.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
@@ -42,22 +38,13 @@ public class MediaServiceTest {
     @Autowired
     private MediaService mediaService;
 
-    private static UploadMediaRequest buildUploadMediaRequest(InputStream inputStream) throws IOException {
-        UploadMediaRequest request = new UploadMediaRequest();
-        MultipartFile file = new MockMultipartFile("media", inputStream);
-        request.setMediaFile(file);
-        request.setCategory(ACTION);
-        request.setUserId(201L);
-        return request;
-    }
-
     @Test
     @DisplayName("test you can upload images")
     public void uploadMediaTest(){
         Path path = Paths.get(TEST_IMAGE_LOCATION);
 
         try(var inputStream = Files.newInputStream(path);){
-            UploadMediaRequest uploadMediaRequest = buildUploadMediaRequest(inputStream);
+            UploadMediaRequest uploadMediaRequest = buildUploadRequest(inputStream);
             UploadMediaResponse response = mediaService.upload(uploadMediaRequest);
 
             log.info("response --> {}", response);
@@ -74,7 +61,7 @@ public class MediaServiceTest {
         Path path = Paths.get(TEST_VIDEO_LOCATION);
 
         try(var inputStream = Files.newInputStream(path);){
-            UploadMediaRequest uploadMediaRequest = buildUploadMediaRequest(inputStream);
+            UploadMediaRequest uploadMediaRequest = buildUploadRequest(inputStream);
             UploadMediaResponse response = mediaService.upload(uploadMediaRequest);
 
             assertThat(response).isNotNull();
@@ -94,33 +81,15 @@ public class MediaServiceTest {
 
 
     @Test
-    @DisplayName("test update media files")
-    public void updateCategoryTest(){
-        assertThat(mediaService.getMediaBy(101).getDescription()).contains("media");
-        assertThat(mediaService.getMediaBy(101L).getCategory()).isEqualTo(ACTION);
-
-        UpdateMediaRequest updateMediaRequest = new UpdateMediaRequest();
-        updateMediaRequest.setId(101L);
-        updateMediaRequest.setCategory(HORROR);
-        updateMediaRequest.setDescription("THis is a horror movie");
-        mediaService.update(updateMediaRequest);
-
-        Media media = mediaService.getMediaBy(101L);
-
-        assertThat(media.getDescription()).contains("horror");
-        assertThat(media.getCategory()).isEqualTo(HORROR);
-    }
-
-    @Test
     @DisplayName("Test that media can be updated without setting the rest null")
-    public void updateTest(){
+    public void updateMediaTest(){
         Category category = mediaService.getMediaBy(100L).getCategory();
         assertThat(category).isEqualTo(ACTION);
 
         try{
             List<JsonPatchOperation> operations = List.of(new ReplaceOperation(new JsonPointer("/category"), new TextNode(ROMANCE.name())));
             JsonPatch updateMediaRequest = new JsonPatch(operations);
-            UpdateMediaResponse response = mediaService.updateOne(100L, updateMediaRequest);
+            UpdateMediaResponse response = mediaService.updateMedia(100L, updateMediaRequest);
             assertThat(response).isNotNull();
             category = mediaService.getMediaBy(100L).getCategory();
             assertThat(category).isEqualTo(ROMANCE);

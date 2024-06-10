@@ -13,6 +13,7 @@ import com.mavericksstube.maverickshub.dtos.response.MediaResponse;
 import com.mavericksstube.maverickshub.dtos.response.UpdateMediaResponse;
 import com.mavericksstube.maverickshub.dtos.response.UploadMediaResponse;
 import com.mavericksstube.maverickshub.exceptions.MediaNotFoundException;
+import com.mavericksstube.maverickshub.exceptions.MediaUpdateFailedException;
 import com.mavericksstube.maverickshub.exceptions.MediaUploadFailedException;
 import com.mavericksstube.maverickshub.models.Media;
 import com.mavericksstube.maverickshub.models.User;
@@ -39,7 +40,6 @@ public class MavericksHubMediaService implements MediaService{
 
     @Override
     public UploadMediaResponse upload(UploadMediaRequest uploadMediaRequest) {
-        User user = userService.getById(uploadMediaRequest.getUserId());
         try {
            Uploader uploader = cloudinary.uploader();
 
@@ -50,7 +50,7 @@ public class MavericksHubMediaService implements MediaService{
 
            Media media = modelMapper.map(uploadMediaRequest, Media.class);
            media.setUrl(url);
-           media.setUploader(user);
+           media.setUploader(userService.getById(uploadMediaRequest.getUserId()));
            media = mediaRepository.save(media);
 
            return modelMapper.map(media, UploadMediaResponse.class);
@@ -65,31 +65,24 @@ public class MavericksHubMediaService implements MediaService{
     }
 
     @Override
-    public UpdateMediaResponse update(UpdateMediaRequest updateMediaRequest) {
-        Media media = getMediaBy(updateMediaRequest.getId());
-        media.setDescription(updateMediaRequest.getDescription());
-        media.setCategory(updateMediaRequest.getCategory());
-        mediaRepository.save(media);
-        return modelMapper.map(media, UpdateMediaResponse.class);
-    }
-
-    @Override
-    public UpdateMediaResponse updateOne(long mediaId, JsonPatch updateMediaRequest) {
-        Media media = getMediaBy(mediaId);
-        ObjectMapper mapper = new ObjectMapper();
-        try{
-            JsonNode mediaNode = mapper.convertValue(media, JsonNode.class);
-            mediaNode = updateMediaRequest.apply(mediaNode);
-            media = mapper.convertValue(mediaNode, Media.class);
+    public UpdateMediaResponse updateMedia(Long mediaId, JsonPatch jsonPatch) {
+        try {
+            Media media = getMediaBy(mediaId);
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode mediaNode = objectMapper.convertValue(media, JsonNode.class);
+            mediaNode = jsonPatch.apply(mediaNode);
+            media = objectMapper.convertValue(mediaNode, Media.class);
             media = mediaRepository.save(media);
             return modelMapper.map(media, UpdateMediaResponse.class);
-        } catch (JsonPatchException e){
-            return null;
+        } catch (JsonPatchException exception){
+            throw new MediaUpdateFailedException("media update failed");
         }
     }
 
+
     @Override
     public List<MediaResponse> getMediaFor(Long userId) {
+        userService.getById(userId);
         List<Media> media = mediaRepository.findAllMediaFor(userId);
         return media.stream().map(m -> modelMapper.map(m, MediaResponse.class)).toList();
     }

@@ -57,4 +57,5 @@ public class MediaControllerTest {
             assertThat(e).isNotNull();
         }
     }
+
 }

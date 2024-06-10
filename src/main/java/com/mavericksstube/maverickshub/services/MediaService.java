@@ -15,9 +15,7 @@ public interface MediaService {
 
     Media getMediaBy(long id);
 
-    UpdateMediaResponse update(UpdateMediaRequest updateMediaRequest);
-
-    UpdateMediaResponse updateOne(long mediaId, JsonPatch updateMediaRequest);
+    UpdateMediaResponse updateMedia(Long mediaId, JsonPatch updateMediaRequest);
 
     List<MediaResponse> getMediaFor(Long userId);
 }

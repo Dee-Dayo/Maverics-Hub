@@ -1,6 +1,7 @@
 package com.mavericksstube.maverickshub.controllers;
 
 import com.mavericksstube.maverickshub.dtos.requests.UploadMediaRequest;
+import com.mavericksstube.maverickshub.exceptions.UserNotFoundException;
 import com.mavericksstube.maverickshub.services.MediaService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.MediaType;
@@ -22,7 +23,7 @@ public class MediaController {
     }
 
     @GetMapping
-    public ResponseEntity<?> getMediaForUser(@RequestParam Long userId){
+    public ResponseEntity<?> getMediaForUser(@RequestParam Long userId) throws UserNotFoundException {
         return ResponseEntity.ok(mediaService.getMediaBy(userId));
     }
 }
