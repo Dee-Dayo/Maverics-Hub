@@ -38,7 +38,6 @@ public class CustomUsernamePasswordAuthenticationFilter extends UsernamePassword
         } catch (IOException exception){
 
         }
-        return null;
     }
 
     @Override
