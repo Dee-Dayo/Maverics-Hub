@@ -16,6 +16,7 @@
 	<properties>
 		<java.version>21</java.version>
 	</properties>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -54,6 +55,14 @@
     <version>3.1.1</version>
 </dependency>
 
+		<!-- https://mvnrepository.com/artifact/com.sendinblue/sib-api-v3-sdk -->
+<dependency>
+    <groupId>com.sendinblue</groupId>
+    <artifactId>sib-api-v3-sdk</artifactId>
+    <version>4.1.1</version>
+</dependency>
+
+
 		<!-- https://mvnrepository.com/artifact/com.cloudinary/cloudinary-http44 -->
 <dependency>
     <groupId>com.cloudinary</groupId>
@@ -68,6 +77,12 @@
     <version>1.13</version>
 </dependency>
 
+		<!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-security -->
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-security</artifactId>
+    <version>3.3.0</version>
+</dependency>
 
 
 	</dependencies>

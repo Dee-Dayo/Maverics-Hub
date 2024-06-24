@@ -8,43 +8,36 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import static jakarta.persistence.EnumType.STRING;
 import static java.time.LocalDateTime.now;
 
-
-@Entity
-@Getter
 @Setter
-@ToString
-public class Media {
+@Getter
+@Entity
+public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String url;
-    private String description;
-    @Enumerated(value = STRING)
-    private Category category;
+    private Long userId;
+    private String comment;
 
     @Setter(AccessLevel.NONE)
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
-    private LocalDateTime timeCreated;
+    private LocalDateTime commentDate;
 
     @ManyToOne
-    private User uploader;
+    private Media media;
 
-
-
+    @OneToMany(fetch = FetchType.EAGER)
+    private List<Comment> commentReplies = new ArrayList<>();
 
     @PrePersist
-    private void setTimeCreated(){
-        this.timeCreated = now();
+    private void setCommentDate() {
+        this.commentDate = now();
     }
-
 }

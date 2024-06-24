@@ -24,6 +24,6 @@ public class MediaController {
 
     @GetMapping
     public ResponseEntity<?> getMediaForUser(@RequestParam Long userId) throws UserNotFoundException {
-        return ResponseEntity.ok(mediaService.getMediaBy(userId));
+        return ResponseEntity.ok(mediaService.getMediaFor(userId));
     }
 }

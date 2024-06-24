@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 //@AllArgsConstructor              this or use the constructor injection
-public class MavericksHubUserService implements UserService {
+public class MavericksHubUserService implements UserService{
 
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
@@ -35,5 +35,10 @@ public class MavericksHubUserService implements UserService {
     public User getById(Long id) {
         return userRepository.findById(id).orElseThrow(()->
                 new UserNotFoundException(String.format("User with id %d not found", id)));
+    }
+
+    @Override
+    public User getUserByUsername(String username) {
+        return userRepository.findByEmail(username).orElseThrow(()->new UserNotFoundException("User not found"));
     }
 }

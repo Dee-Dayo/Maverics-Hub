@@ -8,43 +8,36 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import static jakarta.persistence.EnumType.STRING;
 import static java.time.LocalDateTime.now;
 
-
-@Entity
-@Getter
 @Setter
-@ToString
-public class Media {
+@Getter
+@Entity
+@Table(name ="playlists")
+public class Playlist {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String url;
+    private String name;
     private String description;
-    @Enumerated(value = STRING)
-    private Category category;
 
     @Setter(AccessLevel.NONE)
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime timeCreated;
 
+    @Setter(AccessLevel.NONE)
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+    private LocalDateTime timeUpdated;
+
     @ManyToOne
     private User uploader;
 
-
-
-
-    @PrePersist
-    private void setTimeCreated(){
-        this.timeCreated = now();
-    }
-
+    
 }
