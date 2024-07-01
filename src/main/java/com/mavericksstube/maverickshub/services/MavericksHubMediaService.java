@@ -15,6 +15,7 @@ import com.mavericksstube.maverickshub.dtos.response.UploadMediaResponse;
 import com.mavericksstube.maverickshub.exceptions.MediaNotFoundException;
 import com.mavericksstube.maverickshub.exceptions.MediaUpdateFailedException;
 import com.mavericksstube.maverickshub.exceptions.MediaUploadFailedException;
+import com.mavericksstube.maverickshub.exceptions.UserNotFoundException;
 import com.mavericksstube.maverickshub.models.Media;
 import com.mavericksstube.maverickshub.models.User;
 import com.mavericksstube.maverickshub.repositories.MediaRepository;
@@ -56,7 +57,9 @@ public class MavericksHubMediaService implements MediaService{
            return modelMapper.map(media, UploadMediaResponse.class);
        }catch (IOException exception) {
            throw new MediaUploadFailedException("media upload failed");
-       }
+       } catch (UserNotFoundException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -81,7 +84,7 @@ public class MavericksHubMediaService implements MediaService{
 
 
     @Override
-    public List<MediaResponse> getMediaFor(Long userId) {
+    public List<MediaResponse> getMediaFor(Long userId) throws UserNotFoundException {
         userService.getById(userId);
         List<Media> media = mediaRepository.findAllMediaFor(userId);
         return media.stream().map(m -> modelMapper.map(m, MediaResponse.class)).toList();

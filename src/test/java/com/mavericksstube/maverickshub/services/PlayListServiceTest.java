@@ -4,6 +4,7 @@ import com.mavericksstube.maverickshub.dtos.requests.AddMediaToPlaylistRequest;
 import com.mavericksstube.maverickshub.dtos.requests.CreatePlaylistRequest;
 import com.mavericksstube.maverickshub.dtos.response.AddMediaToPlaylistResponse;
 import com.mavericksstube.maverickshub.dtos.response.CreatePlaylistResponse;
+import com.mavericksstube.maverickshub.exceptions.UserNotFoundException;
 import com.mavericksstube.maverickshub.models.Media;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +23,7 @@ public class PlayListServiceTest {
     private MediaService mediaService;
 
     @Test
-    public void testCreatePlaylist(){
+    public void testCreatePlaylist() throws UserNotFoundException {
         CreatePlaylistRequest createPlaylistRequest = new CreatePlaylistRequest();
         createPlaylistRequest.setName("name");
         createPlaylistRequest.setDescription("description");

@@ -36,13 +36,13 @@ public class MavericksHubUserService implements UserService{
     }
 
     @Override
-    public User getById(Long id) {
+    public User getById(Long id) throws UserNotFoundException {
         return userRepository.findById(id).orElseThrow(()->
                 new UserNotFoundException(String.format("User with id %d not found", id)));
     }
 
     @Override
-    public User getUserByUsername(String username) {
+    public User getUserByUsername(String username) throws UserNotFoundException {
         return userRepository.findByEmail(username).orElseThrow(()->new UserNotFoundException("User not found"));
     }
 }

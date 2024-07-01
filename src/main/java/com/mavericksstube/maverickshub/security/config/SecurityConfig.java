@@ -4,10 +4,13 @@ import com.mavericksstube.maverickshub.security.filters.CustomUsernamePasswordAu
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+
+import static org.springframework.http.HttpMethod.POST;
 
 @Configuration
 @AllArgsConstructor
@@ -20,7 +23,8 @@ public class SecurityConfig {
         authenticationFilter.setFilterProcessesUrl("/api/v1/auth");
         return httpSecurity.csrf(c -> c.disable()).cors(c -> c.disable())
                 .addFilterAt(authenticationFilter, BasicAuthenticationFilter.class)
-                .authorizeHttpRequests(c -> c.anyRequest().permitAll()).build();
+                .authorizeHttpRequests(c -> c.requestMatchers(POST,"/api/v1/auth").permitAll()
+                        .requestMatchers("/api/v1/media").hasAnyAuthority("USER")).build();
     }
 
 }

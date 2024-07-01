@@ -50,11 +50,11 @@ public class MediaControllerTest {
     @Test
     public void testGetMediaUser(){
         try{
-            mvc.perform(get("api/v1/media?userId=200")
+            mvc.perform(get("api/v1/media?userId=203")
                     .contentType(MediaType.APPLICATION_JSON))
                     .andExpect(status().is2xxSuccessful()).andDo(print());
         } catch (Exception e){
-            assertThat(e).isNotNull();
+            assertThat(e).isNull();
         }
     }
 

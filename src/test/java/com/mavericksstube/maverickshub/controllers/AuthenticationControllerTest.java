@@ -16,13 +16,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@Sql(scripts = {"/db/data.sql"})
+
 public class AuthenticationControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
 
     @Test
-    @Sql(scripts = {"/db/data.sql"})
     public void authenticateUserTest() throws Exception {
         LoginRequest request = new LoginRequest();
         request.setUsername("john@email.com");
@@ -34,4 +35,18 @@ public class AuthenticationControllerTest {
                 .andExpect(status().isOk())
                 .andDo(print());
     }
+
+    @Test
+    public void testAuthenticationFailedFor() throws Exception {
+        LoginRequest request = new LoginRequest();
+        request.setUsername("john1@email.com");
+        request.setPassword("passworrrrd");
+        ObjectMapper mapper = new ObjectMapper();
+        mockMvc.perform(post("/api/v1/auth")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsBytes(request)))
+                .andExpect(status().isUnauthorized())
+                .andDo(print());
+    }
+
 }

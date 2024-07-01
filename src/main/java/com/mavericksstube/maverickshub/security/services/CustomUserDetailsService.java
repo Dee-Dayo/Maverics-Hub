@@ -1,5 +1,6 @@
 package com.mavericksstube.maverickshub.security.services;
 
+import com.mavericksstube.maverickshub.exceptions.UserNotFoundException;
 import com.mavericksstube.maverickshub.models.User;
 import com.mavericksstube.maverickshub.security.models.SecureUser;
 import com.mavericksstube.maverickshub.services.UserService;
@@ -20,8 +21,8 @@ public class CustomUserDetailsService implements UserDetailsService {
             User user = userService.getUserByUsername(username);
             return new SecureUser(user);
         }
-        catch (UsernameNotFoundException exception) {
-            throw new UsernameNotFoundException(exception.getMessage());
+        catch (UserNotFoundException e) {
+            throw new UsernameNotFoundException(e.getMessage());
         }
     }
 }

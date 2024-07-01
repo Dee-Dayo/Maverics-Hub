@@ -5,6 +5,7 @@ import com.mavericksstube.maverickshub.dtos.requests.CreatePlaylistRequest;
 import com.mavericksstube.maverickshub.dtos.response.AddMediaToPlaylistResponse;
 import com.mavericksstube.maverickshub.dtos.response.CreatePlaylistResponse;
 import com.mavericksstube.maverickshub.exceptions.PlaylistNotFoundException;
+import com.mavericksstube.maverickshub.exceptions.UserNotFoundException;
 import com.mavericksstube.maverickshub.models.Media;
 import com.mavericksstube.maverickshub.models.Playlist;
 import com.mavericksstube.maverickshub.models.User;
@@ -25,7 +26,7 @@ public class MavericksHubPlaylistService implements PlaylistService{
 
 
     @Override
-    public CreatePlaylistResponse create(CreatePlaylistRequest createPlaylistRequest) {
+    public CreatePlaylistResponse create(CreatePlaylistRequest createPlaylistRequest) throws UserNotFoundException {
         Playlist newPlaylist = modelMapper.map(createPlaylistRequest, Playlist.class);
         User uploader = userService.getById(createPlaylistRequest.getUserId());
         newPlaylist.setUploader(uploader);
