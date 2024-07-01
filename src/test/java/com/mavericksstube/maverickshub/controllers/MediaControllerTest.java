@@ -7,8 +7,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.mock.web.MockPart;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -26,6 +28,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @Sql(scripts = {"/db/data.sql"})
 @AutoConfigureMockMvc
+@WithMockUser(authorities = {"USER"})
 public class MediaControllerTest {
 
     @Autowired
@@ -50,12 +53,18 @@ public class MediaControllerTest {
     @Test
     public void testGetMediaUser(){
         try{
-            mvc.perform(get("api/v1/media?userId=203")
+            mvc.perform(get("/api/v1/media?userId=200")
                     .contentType(MediaType.APPLICATION_JSON))
                     .andExpect(status().is2xxSuccessful()).andDo(print());
         } catch (Exception e){
             assertThat(e).isNull();
         }
+    }
+
+    @Test
+    public void testGetMediaForUserShouldFailForInvalidUserId() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.get("/api/v1/media?userId=2000")
+                .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isBadRequest()).andDo(print());
     }
 
 }
